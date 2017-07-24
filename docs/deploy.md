@@ -12,9 +12,6 @@
 Only if you've already completed these steps:
 
 -   You've found a model work that works well on your data
--   You've created a column called InTestWindowFLG (or something
-    similar), where 'Y' denotes rows that need a prediction and 'N' for
-    rows that train the model.
 -   You've created the SQL table structure to receive predictions
 
 For classification predictions:
@@ -70,7 +67,7 @@ cnxn = pyodbc.connect("""SERVER=localhost;
 For CSV:
 
 ```python
-df = pd.read_csv(DiabetesClinicalSampleData.csv,
+df = pd.read_csv(DiabetesClincialSampleData.csv,
                  na_values=['None'])
 ```
 
@@ -81,31 +78,30 @@ creation.
 
 -   **Return**: an object.
 -   **Arguments**:
-    :   -   **modeltype**: a string. This will either be
+    :   -   **model_type**: a string. This will either be
             'classification' or 'regression'.
-        -   **df**: a data frame. The data your model will be based on.
-        -   **predictedcol**: a string. Name of variable (or column)
-            that you want to predict.
-        -   **graincol**: a string, defaults to None. Name of possible
+        -   **dataframe**: a data frame. The data your model will be based on.
+        -   **grain_column**: a string, defaults to None. Name of possible
             GrainID column in your dataset. If specified, this column
             will be removed, as it won't help the algorithm.
+        -   **window_column**: a string. Which column in the dataset denotes
+            which rows are test ('Y') or training ('N').
+        -   **predicted_column**: a string. Name of variable (or column)
+            that you want to predict.
         -   **impute**: a boolean. Whether to impute by replacing NULLs
             with column mean (for numeric columns) or column mode (for
             categorical columns).
         -   **debug**: a boolean, defaults to False. If TRUE, console
             output when comparing models is verbose for easier
             debugging.
-        -   **windowcol**: a string. Which column in the dataset denotes
-            which rows are test ('Y') or training ('N').
 
 Example code:
 
 ```python
-p = DeploySupervisedModel(modeltype='regression',
-                          df=df,
-                          graincol='PatientEncounterID',
-                          windowcol='InTestWindowFLG',
-                          predictedcol='LDLNBR',
+p = DeploySupervisedModel(model_type='regression',
+                          dataframe=df,
+                          grain_column='PatientEncounterID',
+                          predicted_column='LDLNBR',
                           impute=True,
                           debug=False)
 ```
@@ -158,7 +154,7 @@ def main():
 
     # Load in data
     # CSV snippet for reading data into dataframe
-    df = pd.read_csv('healthcareai/tests/fixtures/DiabetesClinicalSampleData.csv',
+    df = pd.read_csv('healthcareai/tests/fixtures/DiabetesClincialSampleData.csv',
                     na_values=['None'])
 
     # SQL snippet for reading data into dataframe
@@ -183,11 +179,10 @@ def main():
     # Drop columns that won't help machine learning
     df.drop('PatientID', axis=1, inplace=True)
 
-    p = DeploySupervisedModel(modeltype='regression',
-                              df=df,
-                              graincol='PatientEncounterID',
-                              windowcol='InTestWindowFLG',
-                              predictedcol='LDLNBR',
+    p = DeploySupervisedModel(model_type='regression',
+                              datafrme=df,
+                              grain_column='PatientEncounterID',
+                              predicted_column='LDLNBR',
                               impute=True,
                               debug=False)
 
